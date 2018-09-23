@@ -20,7 +20,7 @@ def delemptydir(root):
     return False
 
 
-def checkDir(tablePath, show=False):
+def checkDir(tablePath, delete=False, show=False):
     """获取库中单个表中所有文章路径"""
     dellist=[]
     glist = list(os.walk(tablePath))
@@ -32,14 +32,16 @@ def checkDir(tablePath, show=False):
                 #         目录不存在,mmbw删除
                 if show:
                     dellist.append(os.path.join(root, dirs[ditem]))
-                del dirs[ditem]
+                if delete:
+                    del dirs[ditem]
 
 
         if (dirs.__len__() == 0 and files.__len__() == 0):
             if(delemptydir(root)):
                 if show:
                     dellist.append(root)
-                del glist[item]
+                if delete:
+                    del glist[item]
     return set(dellist)
 
 
@@ -47,8 +49,10 @@ def checkDir(tablePath, show=False):
 import optparse
 if __name__ == "__main__":
 
-    parse = optparse.OptionParser(usage='"usage:%prog [options] arg1,arg2"', version="%prog 1.2")
-    parse.add_option('-d', '--dir', dest='dir', action='store', type=str, default="./", help="del root dir path")
+    parse = optparse.OptionParser(usage="-p ./ [-d|-c]")
+    parse.add_option('-p', '--path', dest='path', action='store', type=str, default="./", help="del root dir path")
+
+    parse.add_option('-d', '--delete', dest='delete', action='store_true', default=False, help="del root dir path empty")
     parse.add_option('-c', '--check', dest='check', action='store_true', default=False, help="show empty dir list")
 
 
@@ -60,7 +64,12 @@ if __name__ == "__main__":
     # print(statinfo)
     # print ( int(oct(statinfo.st_mode)[-3:-2]) % 2)
 
-    delres =checkDir(options.dir, options.check)
+    delres =checkDir(options.path, options.delete, options.check)
     if( options.check ):
-        for item in delres:
-            print( item )
+        if(delres.__len__()):
+            print("empty dir is ", delres.__len__())
+            for item in delres:
+                print( item )
+        else:
+            print("empty dir is null")
+
