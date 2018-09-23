@@ -2,7 +2,7 @@ import  os
 
 
 
-def delnotexistsdir(root):
+def delnotexistsdir(root, delete=False):
     if (not os.path.exists(root)):
         #         目录不存在,mmbw删除
         # statinfo = os.stat(root)
@@ -11,11 +11,12 @@ def delnotexistsdir(root):
             return True
     return False
 
-def delemptydir(root):
+def delemptydir(root, delete=False):
     if( os.path.exists(root) ):
         statinfo = os.stat(root)
         if (int(oct(statinfo.st_mode)[-3:-2]) % 2 == 1):
-            os.removedirs(root)
+            if delete:
+                os.removedirs(root)
             return True
     return False
 
@@ -28,19 +29,17 @@ def checkDir(tablePath, delete=False, show=False):
         root, dirs, files = glist[item]
         # print("1",root, dirs, files)
         for ditem in range(dirs.__len__() - 1, -1, -1):
-            if(delnotexistsdir(os.path.join(root, dirs[ditem]))):
+            if(delnotexistsdir(os.path.join(root, dirs[ditem]), delete)):
                 #         目录不存在,mmbw删除
                 if show:
                     dellist.append(os.path.join(root, dirs[ditem]))
-                if delete:
                     del dirs[ditem]
 
 
         if (dirs.__len__() == 0 and files.__len__() == 0):
-            if(delemptydir(root)):
+            if(delemptydir(root, delete)):
                 if show:
                     dellist.append(root)
-                if delete:
                     del glist[item]
     return set(dellist)
 
@@ -65,11 +64,9 @@ if __name__ == "__main__":
     # print ( int(oct(statinfo.st_mode)[-3:-2]) % 2)
 
     delres =checkDir(options.path, options.delete, options.check)
+    print("empty dir is ", delres.__len__())
     if( options.check ):
         if(delres.__len__()):
-            print("empty dir is ", delres.__len__())
             for item in delres:
                 print( item )
-        else:
-            print("empty dir is null")
 
