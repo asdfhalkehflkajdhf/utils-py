@@ -1,0 +1,66 @@
+import  os
+
+
+
+def delnotexistsdir(root):
+    if (not os.path.exists(root)):
+        #         目录不存在,mmbw删除
+        # statinfo = os.stat(root)
+        # if (int(oct(statinfo.st_mode)[-3:-2]) % 2 == 1):
+        #     os.removedirs(root)
+            return True
+    return False
+
+def delemptydir(root):
+    if( os.path.exists(root) ):
+        statinfo = os.stat(root)
+        if (int(oct(statinfo.st_mode)[-3:-2]) % 2 == 1):
+            os.removedirs(root)
+            return True
+    return False
+
+
+def checkDir(tablePath, show=False):
+    """获取库中单个表中所有文章路径"""
+    dellist=[]
+    glist = list(os.walk(tablePath))
+    for item in range(glist.__len__() - 1, -1, -1):
+        root, dirs, files = glist[item]
+        # print("1",root, dirs, files)
+        for ditem in range(dirs.__len__() - 1, -1, -1):
+            if(delnotexistsdir(os.path.join(root, dirs[ditem]))):
+                #         目录不存在,mmbw删除
+                if show:
+                    dellist.append(os.path.join(root, dirs[ditem]))
+                del dirs[ditem]
+
+
+        if (dirs.__len__() == 0 and files.__len__() == 0):
+            if(delemptydir(root)):
+                if show:
+                    dellist.append(root)
+                del glist[item]
+    return set(dellist)
+
+
+
+import optparse
+if __name__ == "__main__":
+
+    parse = optparse.OptionParser(usage='"usage:%prog [options] arg1,arg2"', version="%prog 1.2")
+    parse.add_option('-d', '--dir', dest='dir', action='store', type=str, default="./", help="del root dir path")
+    parse.add_option('-c', '--check', dest='check', action='store_true', default=False, help="show empty dir list")
+
+
+    (options,args) = parse.parse_args()
+
+
+
+    # statinfo=os.stat(tablePath)
+    # print(statinfo)
+    # print ( int(oct(statinfo.st_mode)[-3:-2]) % 2)
+
+    delres =checkDir(options.dir, options.check)
+    if( options.check ):
+        for item in delres:
+            print( item )
