@@ -1,0 +1,33 @@
+table_businessInfo
+    business_id       int
+    review_all  int
+    review_tg   int
+
+table_coreStat
+    state       bool
+    uptime        dataTime
+
+table_userInfo
+    crawlingInterval    int
+
+table_commentType
+    type_id      int
+    desc    str
+
+table_commentInfo
+    comment_id  int
+    time        dataTime
+    text        str
+    type_id     int
+    level       int
+    business_id int
+    font_id     int
+    layout_id   int
+
+table_fontLibrary
+    font_id     int
+    url         str
+
+table_layout
+    layout_id   int
+    url         str

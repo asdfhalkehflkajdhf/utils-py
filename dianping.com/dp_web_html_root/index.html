@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>评论显示</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <link rel="stylesheet" href="js/layui/css/layui.css"  media="all">
+  <!-- 注意：如果你直接复制所有代码到本地，上述css路径需要改成你本地的 -->
+</head>
+<body>
+    <!-- 导航 -->
+	<div id="navHead" >
+		<!-- 头部区域（可配合layui已有的水平导航） -->
+		<ul class="layui-nav">
+		  <li class="layui-nav-item"><a href="jacascript::void(0);">ＸＸ连锁店大众风评</a></li>
+		  <li class="layui-nav-item"><a href="jacascript::void(0);">系统状态</a></li>
+		  <li class="layui-nav-item layui-this">
+			<a href="jjacascript::void(0);">配置</a>
+			<dl class="layui-nav-child">
+			  <dd><a href="jacascript::void(0);">选项1</a></dd>
+			  <dd><a href="jacascript::void(0);">选项2</a></dd>
+			  <dd><a href="jacascript::void(0);">选项3</a></dd>
+			</dl>
+		  </li>
+		  <li class="layui-nav-item">
+			<a href="jacascript::void(0);">日志</a>
+			<dl class="layui-nav-child">
+			  <dd><a href="jacascript::void(0);">点评账户</a></dd>
+			  <dd><a href="jacascript::void(0);">爬虫出错</a></dd>
+			</dl>
+		  </li>
+		  <!-- <li class="layui-nav-item"><a href="jacascript:void(0);" onclick="switchTabState(this);" value="false">循环播放</a></li> -->
+		  <!-- <li class="layui-nav-item"><a href="">社区</a></li> -->
+		</ul>
+	</div>
+
+	<!-- 带删除功能的Tab　一个商户号一个iframe -->
+	<div id="showContent" class="layui-tab layui-tab-card" lay-allowclose="true" lay-filter="test" >
+	  <ul class="layui-tab-title" id="tabList">
+		<li name="tabLi" class="layui-this" lay-id="11">总览</li>
+		<li name="tabLi" lay-id="22">分店1</li>
+		<li name="tabLi" lay-id="33">分店2</li>
+		<li name="tabLi" lay-id="44">分店3</li>
+		<li name="tabLi" lay-id="55">分店4</li>
+	  </ul>
+	  <div id="tabContent" class="layui-tab-content" style="height: 100%">
+		<div class="layui-tab-item layui-show">
+
+		  1.分店自动切换，切换速度自动配置。<br>
+		  2.服务最终部署在地本服务器，我们不存用户任何信息。<br>
+		  3.所有功能和权限全部开放，只进行一次授权，防止直接二次出售。<br><br>
+		  4.全屏展示，F11 ，再F5刷新自动适配页面
+		  
+		  
+		  
+		</div>
+		<!-- 必须加 style="height: 100%" 要不iframe高度会失效 -->
+		<div class="layui-tab-item" style="height: 100%">
+			<iframe src="rollingComments.php?businesses_id=1234" name="iframe_1234" scrolling="auto" width="100%" height="100%"></iframe>
+		</div>
+		<div class="layui-tab-item" style="height: 100%">
+			<iframe src="rollingComments.php?businesses_id=1234" name="iframe_1234" scrolling="auto" width="100%" height="100%"></iframe>
+		</div>
+		<div class="layui-tab-item" style="height: 100%">
+			<iframe src="rollingComments.php?businesses_id=1234" name="iframe_1234" scrolling="auto" width="100%" height="100%"></iframe>
+		</div>
+		<div class="layui-tab-item" style="height: 100%">
+			<iframe src="rollingComments.php?businesses_id=1234" name="iframe_1234" scrolling="auto" width="100%" height="100%"></iframe>
+		</div>
+		<div class="layui-tab-item" style="height: 100%">
+			<iframe src="rollingComments.php?businesses_id=1234" name="iframe_1234" scrolling="auto" width="100%" height="100%"></iframe>
+		</div>
+	  </div>
+	</div>   
+	
+	
+	<!-- <div id="footer" class="layui-footer" style="text-align:center;"> -->
+		<!-- 底部固定区域 -->
+		<!-- © layui.com - 底部固定区域 -->
+	<!-- </div> -->
+	
+	<script src="js/layui/layui.js" charset="utf-8"></script>
+	<script src="js/jquery-3.3.1.min.js" charset="utf-8"></script>
+	<!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
+	<script>
+		var navHead = document.getElementById("navHead")
+		navHead.style.height= document.documentElement.clientHeight*0.05 +"px";
+		var showContent = document.getElementById("showContent")
+		showContent.style.height= document.documentElement.clientHeight*0.86 +"px";
+		var footer = document.getElementById("footer")
+		<!-- footer.style.height= document.documentElement.clientHeight*0.05 +"px"; -->
+
+		// 初始化全局变量
+		var g_switchTabTimer=null;
+		<!-- var g_switchTabTimer = window.setTimeout( switchTab, 1000*1); -->
+		<!-- window.clearTimeout(g_switchTabTimer); -->
+		var g_tabArray=[];
+		var g_curLayid=null;
+	</script>
+	<script>
+
+			
+		layui.use('element', function(){
+			var $ = layui.jquery
+			,element = layui.element; //Tab的切换功能，切换事件监听等，需要依赖element模块
+		  
+			function upTabListInfo(){
+				var tabList = document.getElementsByName("tabLi");
+				tabList.forEach(function(item){
+					g_tabArray.push(item.getAttribute("lay-id"));
+				});
+				g_curLayid=g_tabArray[0]
+			}
+			upTabListInfo();
+			<!-- console.log(g_tabArray); -->
+			
+
+			<!-- 动态切换 -->
+			function switchTab(){
+				g_curLayid = g_tabArray[(g_tabArray.indexOf(g_curLayid)+1)%g_tabArray.length];
+				<!-- console.log("s "+g_curLayid); -->
+				element.tabChange('test', g_curLayid);
+				g_switchTabTimer = window.setTimeout( switchTab, 1000*2);
+			}
+			g_switchTabTimer = window.setTimeout( switchTab, 1000*2);
+			<!-- element.tabChange('test', layid); -->
+			function switchTabState(obj){
+				obj.value= !obj.value;
+				console.log(obj.value);
+				if(obj.value){
+					obj.text="停止循环";
+					g_switchTabTimer = window.setTimeout( switchTab, 1000*2);
+				}else{
+					obj.text="循环播放";
+					window.clearTimeout(g_switchTabTimer);
+					g_switchTabTimer=null
+				}
+			}
+
+			
+			
+			//Hash地址的定位
+			var layid = location.hash.replace(/^#test=/, '');
+			element.tabChange('test', layid);
+			element.on('tab(test)', function(elem){
+				<!-- location.hash = 'test='+ $(this).attr('lay-id'); -->
+				g_curLayid=$(this).attr('lay-id');
+				<!-- console.log("o "+g_curLayid); -->
+				
+				<!-- 选择之后，停留３分钟后，再循环 -->
+				if(g_switchTabTimer){
+					window.clearTimeout(g_switchTabTimer);
+					g_switchTabTimer = window.setTimeout( switchTab, 1000*60*3);
+				}
+				
+			});
+			
+			<!-- 删除tab -->
+			element.on('tabDelete(test)', function(data){
+				<!-- console.log(this); //当前Tab标题所在的原始DOM元素 -->
+				<!-- console.log(data.index); //得到当前Tab的所在下标 -->
+				<!-- console.log(data.elem); //得到当前的Tab大容器 -->
+				g_tabArray.splice(data.index,1);
+			});
+		  
+		});
+	
+	</script>
+</body>
+</html>
